@@ -13,7 +13,7 @@
 #   -g/--debug       Build a debug version
 #
 
-GO_BUILD_VERSION="2.0.0beta1"
+GO_BUILD_VERSION="2.0.2"
 
 OLDIFS="$IFS"
 
@@ -441,6 +441,10 @@ http() {
   local file="$3"
   [ -n "$url" ] || return 1
 
+  if [[ $IS_TEST != "true" ]]; then
+    url="https://go.dev/dl/${url}"
+  fi
+
   if type curl &>/dev/null; then
     "http_${method}_curl" "$url" "$file"
   elif type wget &>/dev/null; then
@@ -494,7 +498,7 @@ fetch_tarball() {
     package_url="${package_url%%#*}"
 
     if [ -n "$GO_BUILD_MIRROR_URL" ]; then
-      if [[ -z "$GO_BUILD_DEFAULT_MIRROR" || $package_url != */www.golang.org/* ]]; then
+      if [[ -z "$GO_BUILD_DEFAULT_MIRROR" || $package_url != */go.dev/* ]]; then
         mirror_url="${GO_BUILD_MIRROR_URL}/$checksum"
       fi
     fi
@@ -747,6 +751,10 @@ sort_versions() {
     LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
 }
 
+latest_version() {
+  list_definitions | grep -oE "^$1\\.([0-9]+)?" | tail -1
+}
+
 unset VERBOSE
 unset KEEP_BUILD_PATH
 unset DEBUG
@@ -804,11 +812,13 @@ done
 
 DEFINITION_PATH="${ARGUMENTS[0]}"
 
-# NOTE: Try to capture semantic versions such as `1.11` which don't have a patch version.
-# A patch version of 0 will be added, e.g they'll be changed to `1.11.0`.
+# The latest patch version will be located, e.g if 1.11 is supplied they'll be changed to `1.11.x`.
+# NOTE: Try to capture semantic versions such as `1.11` which don't have a patch version and install latest patch.
 if grep -q -E "^[0-9]+\.[0-9]+(\s*)$" <<<${DEFINITION_PATH}; then
-  DEFINITION_PATH="${DEFINITION_PATH}.0"
-  echo "Adding patch version 0 to ${DEFINITION_PATH}"
+  REGEX=$(echo $DEFINITION_PATH | sed s/\\./\\\\./)
+  LATEST_PATCH=$(latest_version $REGEX)
+  echo "Using latest patch version $LATEST_PATCH"
+  DEFINITION_PATH="$LATEST_PATCH"
 fi
 
 if [ -z "$DEFINITION_PATH" ]; then
