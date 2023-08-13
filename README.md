@@ -1,9 +1,11 @@
 # Go Version Management: goenv
 
-[![PR Checks Status](https://github.com/syndbg/goenv/actions/workflows/pr_checks.yml/badge.svg)](https://github.com/syndbg/goenv/actions/workflows/pr_checks.yml)
+[![PR Checks Status](https://github.com/go-nv/goenv/actions/workflows/pr_checks.yml/badge.svg)](https://github.com/go-nv/goenv/actions/workflows/pr_checks.yml)
 
 goenv aims to be as simple as possible and follow the already established
 successful version management model of [pyenv](https://github.com/yyuu/pyenv) and [rbenv](https://github.com/rbenv/rbenv).
+
+New go versions are added automatically on a daily CRON schedule.
 
 This project was cloned from [pyenv](https://github.com/yyuu/pyenv) and modified for Go.
 
@@ -22,6 +24,22 @@ This project was cloned from [pyenv](https://github.com/yyuu/pyenv) and modified
 - https://github.com/crsmithdev/goenv depends on Go,
 - https://github.com/moovweb/gvm is a different approach to the problem that's modeled after `nvm`.
   `goenv` is more simplified.
+
+---
+
+### Hints
+
+#### AWS CodeBuild
+
+The following snippet can be inserted in your buildspec.yml (or buildspec definition) for AWS CodeBuild. It's recommended to do this during the `pre_build` phase.
+    
+**Side Note:** if you use the below steps, please unset your golang version in the buildspec and run the installer manually.
+
+```yaml
+- BUILD_DIR=$PWD
+- cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
+- cd $BUILD_DIR
+```
 
 ---
 

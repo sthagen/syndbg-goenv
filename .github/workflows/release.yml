@@ -1,0 +1,37 @@
+name: Publish to Homebrew
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+jobs:
+  release:
+    if: github.repository_owner == 'go-nv'
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Remove golang
+        run: sudo rm -rf $(which go)
+      - name: Add goenv to PATH
+        run: export PATH="$PATH:./bin/goenv"
+      - name: Create Homebrew PR
+        uses: dawidd6/action-homebrew-bump-formula@v3
+        with:
+          # Required, custom GitHub access token with the 'public_repo' and 'workflow' scopes
+          token: ${{ secrets.GH_TOKEN }}
+          # Optional, will create tap repo fork in organization
+          # org: ORG
+          # Optional, use the origin repository instead of forking
+          no_fork: false
+          # Formula name, required
+          formula: goenv
+          # Optional, will be determined automatically
+          tag: ${{github.ref}}
+          # Optional, will be determined automatically
+          revision: ${{github.sha}}
+          # Optional, if don't want to check for already open PRs
+          force: true # true

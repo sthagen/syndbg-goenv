@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
-# Usage: go-build [-kpv] <definition> <prefix>
+# Usage: go-build [-kpvq] <definition> <prefix>
 #        go-build --definitions
 #        go-build --version
 #
 #   -k/--keep        Do not remove source tree after installation
 #   -v/--verbose     Verbose mode: print compilation status to stdout
+#   -q/--quiet       Disable Progress Bar
 #   -4/--ipv4        Resolve names to IPv4 addresses only
 #   -6/--ipv6        Resolve names to IPv6 addresses only
 #   --definitions    List all built-in definitions
@@ -274,6 +275,16 @@ install_linux_arm() {
     local arch="$(uname -m)"
 
     if [ $arch = "armv6l" ] || [ $arch = "armv7l" ]; then
+      install_package_using "tarball" 1 "$@"
+    fi
+  fi
+}
+
+install_bsd_arm() {
+  if [ "$(uname -s)" = "FreeBSD" ]; then
+    local arch="$(uname -m)"
+
+    if [ $arch = "aarch64" ] || [ $arch = "armv6" ] || [ $arch = "armv7" ]; then
       install_package_using "tarball" 1 "$@"
     fi
   fi
@@ -722,7 +733,7 @@ verify_go() {
       echo
       echo "The go-build could not find proper executable of Go after successful build."
       echo "Please open an issue for future improvements."
-      echo "https://github.com/syndbg/goenv/issues"
+      echo "https://github.com/go-nv/goenv/issues"
       return 1
     } >&3
   fi
@@ -795,6 +806,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "v" | "verbose")
     VERBOSE=true
+    ;;
+  "q" | "quiet")
+    DISABLE_PROGRESS_BAR=true
     ;;
   "g" | "debug")
     DEBUG=true

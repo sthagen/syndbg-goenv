@@ -23,7 +23,43 @@ Some useful goenv commands are:
    whence      List all Go versions that contain the given executable
 
 See 'goenv help <command>' for information on a specific command.
-For full documentation, see: https://github.com/syndbg/goenv#readme
+For full documentation, see: https://github.com/go-nv/goenv#readme
+OUT
+}
+
+@test "Runs install when no command argument is given and GOENV_AUTO_INSTALL is set to 1" {
+  export GOENV_AUTO_INSTALL=1
+
+  echo "Path is $PATH"
+
+  run goenv
+
+  unset GOENV_AUTO_INSTALL
+  
+  assert_failure
+  assert_output <<'OUT'
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
+       goenv install -l|--list
+       goenv install --version
+
+  -l/--list          List all available versions
+  -f/--force         Install even if the version appears to be installed already
+  -s/--skip-existing Skip if the version appears to be installed already
+
+  go-build options:
+
+  -k/--keep          Keep source tree in $GOENV_BUILD_ROOT after installation
+                     (defaults to $GOENV_ROOT/sources)
+  -p/--patch         Apply a patch from stdin before building
+  -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
+  --version          Show version of go-build
+  -g/--debug         Build a debug version
+
+For detailed information on installing Go versions with
+go-build, including a list of environment variables for adjusting
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -100,12 +136,12 @@ OUT
   assert_success "${GOENV_ROOT}/goenv.d:${BATS_TEST_DIRNAME%/*}/goenv.d:/usr/local/etc/goenv.d:/etc/goenv.d:/usr/lib/goenv/hooks"
 }
 
-@test "prints error when called with 'shell' subcommand, but `GOENV_SHELL` environment variable is not present" {
+@test "prints error when called with 'shell' subcommand, but $(GOENV_SHELL) environment variable is not present" {
   unset GOENV_SHELL
   run goenv shell
   assert_output <<'OUT'
 eval "$(goenv init -)" has not been executed.
-Please read the installation instructions in the README.md at github.com/syndbg/goenv
+Please read the installation instructions in the README.md at github.com/go-nv/goenv
 or run 'goenv help init' for more information
 OUT
 

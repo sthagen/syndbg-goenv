@@ -2,8 +2,8 @@
 #
 # Summary: Install a Go version using go-build
 #
-# Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-#        goenv install [-f] [-kvp] <definition-file>
+# Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+#        goenv install [-f] [-kvpq] <definition-file>
 #        goenv install -l|--list
 #        goenv install --version
 #
@@ -17,12 +17,13 @@
 #                      (defaults to $GOENV_ROOT/sources)
 #   -p/--patch         Apply a patch from stdin before building
 #   -v/--verbose       Verbose mode: print compilation status to stdout
+#   -q/--quiet         Disable Progress Bar
 #   --version          Show version of go-build
 #   -g/--debug         Build a debug version
 #
 # For detailed information on installing Go versions with
 # go-build, including a list of environment variables for adjusting
-# compilation, see: https://github.com/syndbg/goenv#readme
+# compilation, see: https://github.com/go-nv/goenv#readme
 #
 set -e
 [ -n "$GOENV_DEBUG" ] && set -x
@@ -46,6 +47,7 @@ if [ "$1" = "--complete" ]; then
   echo --verbose
   echo --version
   echo --debug
+  echo --quiet
   exec go-build --definitions
 fi
 
@@ -63,11 +65,11 @@ definitions() {
 }
 
 latest_version() {
-  definitions | grep -oE "^$1\\.([0-9]+)?" | tail -1
+  definitions | grep -oE "^$1\\.([0-9]+)?$" | tail -1
 }
 
 latest_includes_unstable_version() {
-  definitions | grep -ioE "^$1\\.?([0-9]+|beta[0-9]+|rc[0-9]+)?" | tail -1
+  definitions | grep -ioE "^$1\\.?([0-9]+|beta[0-9]+|rc[0-9]+)?$" | tail -1
 }
 
 indent() {
@@ -106,6 +108,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "p" | "patch")
     HAS_PATCH="-p"
+    ;;
+  "q" | "quiet")
+    QUIET="-q"
     ;;
   "g" | "debug")
     DEBUG="-g"
@@ -228,7 +233,7 @@ trap cleanup SIGINT
 
 # Invoke `go-build` and record the exit status in $STATUS.
 STATUS=0
-go-build $KEEP $VERBOSE $HAS_PATCH $DEBUG "$DEFINITION" "$PREFIX" || STATUS="$?"
+go-build $KEEP $VERBOSE $HAS_PATCH $QUIET $DEBUG "$DEFINITION" "$PREFIX" || STATUS="$?"
 
 # Display a more helpful message if the definition wasn't found.
 if [ "$STATUS" == "2" ]; then

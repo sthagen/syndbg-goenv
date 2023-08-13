@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 
-project_root="${PWD%plugins/go-build}"
+project_root="$(git rev-parse --show-toplevel)"
 load test_helper
 
-export PATH="${project_root}libexec:$PATH"
+export PATH="${project_root}/libexec:$PATH"
 
 @test "has usage instructions" {
   run goenv-help --usage uninstall
@@ -26,6 +26,7 @@ OUT
 --verbose
 --version
 --debug
+--quiet
 1.0.0
 1.2.0
 1.2.2
@@ -38,8 +39,8 @@ OUT
   run goenv-install -h
   assert_success
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -53,12 +54,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -66,8 +68,8 @@ OUT
   run goenv-install --help
   assert_success
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -81,12 +83,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -94,8 +97,8 @@ OUT
   run goenv-install
   assert_failure
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -109,12 +112,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -122,8 +126,8 @@ OUT
   run goenv-install -f
   assert_failure
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -137,12 +141,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -150,8 +155,8 @@ OUT
   run goenv-install --force
   assert_failure
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -165,12 +170,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -178,8 +184,8 @@ OUT
   run goenv-install -f -
   assert_failure
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -193,12 +199,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -206,8 +213,8 @@ OUT
   run goenv-install --force
   assert_failure
   assert_output <<'OUT'
-Usage: goenv install [-f] [-kvp] <version>|latest|unstable
-       goenv install [-f] [-kvp] <definition-file>
+Usage: goenv install [-f] [-kvpq] <version>|latest|unstable
+       goenv install [-f] [-kvpq] <definition-file>
        goenv install -l|--list
        goenv install --version
 
@@ -221,12 +228,13 @@ Usage: goenv install [-f] [-kvp] <version>|latest|unstable
                      (defaults to $GOENV_ROOT/sources)
   -p/--patch         Apply a patch from stdin before building
   -v/--verbose       Verbose mode: print compilation status to stdout
+  -q/--quiet         Disable Progress Bar
   --version          Show version of go-build
   -g/--debug         Build a debug version
 
 For detailed information on installing Go versions with
 go-build, including a list of environment variables for adjusting
-compilation, see: https://github.com/syndbg/goenv#readme
+compilation, see: https://github.com/go-nv/goenv#readme
 OUT
 }
 
@@ -332,6 +340,115 @@ OUT
   run goenv-install latest
 
   unset USE_FAKE_DEFINITIONS
+
+  arch=" "
+  if [ "$(uname -m)" = "aarch64" ]; then
+    arch=" arm "
+  fi
+
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
+  Linux*)
+    assert_output <<-OUT
+Installing latest version ${LATEST_VERSION}...
+Downloading ${LATEST_VERSION}.tar.gz...
+-> http://localhost:8090/${LATEST_VERSION}/${LATEST_VERSION}.tar.gz
+Installing Go Linux${arch}64bit ${LATEST_VERSION}...
+Installed Go Linux${arch}64bit ${LATEST_VERSION} to ${GOENV_ROOT}/versions/${LATEST_VERSION}
+
+OUT
+    ;;
+  Darwin*)
+    assert_output <<-OUT
+Installing latest version ${LATEST_VERSION}...
+Downloading ${LATEST_VERSION}.tar.gz...
+-> http://localhost:8090/${LATEST_VERSION}/${LATEST_VERSION}.tar.gz
+Installing Go Darwin 10.8 64bit ${LATEST_VERSION}...
+Installed Go Darwin 10.8 64bit ${LATEST_VERSION} to ${GOENV_ROOT}/versions/${LATEST_VERSION}
+
+OUT
+    ;;
+  *) machine="UNKNOWN:${unameOut}" ;;
+  esac
+  echo ${machine}
+
+  assert_success
+
+  assert [ -f "${GOENV_ROOT}/versions/${LATEST_VERSION}/bin/go" ]
+  run cat "${GOENV_ROOT}/versions/${LATEST_VERSION}/bin/go"
+}
+
+@test "installs the version without progress bar when -q is given as an argument to install" {
+  # NOTE: Create fake definition to install
+  unset DISABLE_PROGRESS_BAR
+
+  mkdir -p $GOENV_ROOT/plugins/go-build/share/go-build
+
+  LATEST_VERSION=1.2.2
+
+  stub goenv-hooks "install : echo '$HOOK_PATH'/install.bash"
+
+  export USE_FAKE_DEFINITIONS=true
+
+  run goenv-install -q latest
+
+  unset USE_FAKE_DEFINITIONS
+
+  export DISABLE_PROGRESS_BAR=true
+
+  arch=" "
+  if [ "$(uname -m)" = "aarch64" ]; then
+    arch=" arm "
+  fi
+
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
+  Linux*)
+    assert_output <<-OUT
+Installing latest version ${LATEST_VERSION}...
+Downloading ${LATEST_VERSION}.tar.gz...
+-> http://localhost:8090/${LATEST_VERSION}/${LATEST_VERSION}.tar.gz
+Installing Go Linux${arch}64bit ${LATEST_VERSION}...
+Installed Go Linux${arch}64bit ${LATEST_VERSION} to ${GOENV_ROOT}/versions/${LATEST_VERSION}
+
+OUT
+    ;;
+  Darwin*)
+    assert_output <<-OUT
+Installing latest version ${LATEST_VERSION}...
+Downloading ${LATEST_VERSION}.tar.gz...
+-> http://localhost:8090/${LATEST_VERSION}/${LATEST_VERSION}.tar.gz
+Installing Go Darwin 10.8 64bit ${LATEST_VERSION}...
+Installed Go Darwin 10.8 64bit ${LATEST_VERSION} to ${GOENV_ROOT}/versions/${LATEST_VERSION}
+
+OUT
+    ;;
+  *) machine="UNKNOWN:${unameOut}" ;;
+  esac
+  echo ${machine}
+
+  assert_success
+
+  assert [ -f "${GOENV_ROOT}/versions/${LATEST_VERSION}/bin/go" ]
+  run cat "${GOENV_ROOT}/versions/${LATEST_VERSION}/bin/go"
+}
+
+@test "installs the version without progress bar when --quiet is given as an argument to install" {
+  # NOTE: Create fake definition to install
+  unset DISABLE_PROGRESS_BAR
+
+  mkdir -p $GOENV_ROOT/plugins/go-build/share/go-build
+
+  LATEST_VERSION=1.2.2
+
+  stub goenv-hooks "install : echo '$HOOK_PATH'/install.bash"
+
+  export USE_FAKE_DEFINITIONS=true
+
+  run goenv-install --quiet latest
+
+  unset USE_FAKE_DEFINITIONS
+  export DISABLE_PROGRESS_BAR=true
 
   arch=" "
   if [ "$(uname -m)" = "aarch64" ]; then
@@ -615,7 +732,7 @@ OUT
 
   assert [ $output = $expected_binary_contents ]
 
-  run "$(cat ${GOENV_ROOT}/shims/go)"
+  run -127 "$(cat ${GOENV_ROOT}/shims/go)"
 
   # NOTE: Don't assert line 0 since bats modifies it
   assert_line 1 'set -e'
